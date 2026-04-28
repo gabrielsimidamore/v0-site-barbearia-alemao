@@ -1,0 +1,23 @@
+import { SiteHeader } from "@/components/site-header"
+import { Hero } from "@/components/hero"
+import { Servicos } from "@/components/servicos"
+import { Galeria } from "@/components/galeria"
+import { Workshop } from "@/components/workshop"
+import { Contato } from "@/components/contato"
+import { SiteFooter } from "@/components/site-footer"
+import { WhatsappFloat } from "@/components/whatsapp-float"
+
+export default function Home() {
+  return (
+    <main className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+      <SiteHeader />
+      <Hero />
+      <Servicos />
+      <Galeria />
+      <Workshop />
+      <Contato />
+      <SiteFooter />
+      <WhatsappFloat />
+    </main>
+  )
+}

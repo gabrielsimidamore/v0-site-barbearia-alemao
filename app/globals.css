@@ -1,0 +1,130 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Paleta Barbearia do Alemão - preto, dourado e neutros */
+  --background: oklch(0.13 0.005 60); /* preto profundo com leve calor */
+  --foreground: oklch(0.96 0.01 85); /* off-white quente */
+  --card: oklch(0.17 0.008 60);
+  --card-foreground: oklch(0.96 0.01 85);
+  --popover: oklch(0.17 0.008 60);
+  --popover-foreground: oklch(0.96 0.01 85);
+  --primary: oklch(0.78 0.14 82); /* dourado vibrante */
+  --primary-foreground: oklch(0.13 0.005 60);
+  --secondary: oklch(0.22 0.01 60);
+  --secondary-foreground: oklch(0.96 0.01 85);
+  --muted: oklch(0.22 0.01 60);
+  --muted-foreground: oklch(0.7 0.02 80);
+  --accent: oklch(0.65 0.16 145); /* verde whatsapp */
+  --accent-foreground: oklch(0.13 0.005 60);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.28 0.02 75);
+  --input: oklch(0.22 0.01 60);
+  --ring: oklch(0.78 0.14 82);
+  --gold: oklch(0.78 0.14 82);
+  --gold-deep: oklch(0.62 0.13 75);
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans-custom), 'Geist Fallback';
+  --font-display: var(--font-display-custom), 'Geist Fallback';
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Padrão sutil de listras de barbeiro */
+.barber-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 12px,
+    color-mix(in oklch, var(--gold) 8%, transparent) 12px,
+    color-mix(in oklch, var(--gold) 8%, transparent) 14px
+  );
+}
+
+/* Brilho dourado animado */
+@keyframes shimmer {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--gold-deep) 80%, transparent) 0%,
+    var(--gold) 50%,
+    color-mix(in oklch, var(--gold-deep) 80%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-bg 3s linear infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes shimmer-bg {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.float-anim {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Pulso suave para CTA */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent) 50%, transparent); }
+  70% { box-shadow: 0 0 0 16px color-mix(in oklch, var(--accent) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent) 0%, transparent); }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2.4s ease-out infinite;
+}

@@ -20,7 +20,7 @@ const fotos = [
   { src: "/cortes/corte-6.png", alt: "Corte social com fade lateral" },
 ]
 
-// Divide as fotos em duas trilhas para o carrossel duplo
+// Divide em duas trilhas com sentidos opostos para sensação de fluxo dinâmico
 const metade = Math.ceil(fotos.length / 2)
 const trilha1 = fotos.slice(0, metade)
 const trilha2 = fotos.slice(metade)
@@ -36,23 +36,23 @@ function CarrosselTrilha({
   duracao: number
   reverso?: boolean
 }) {
-  // Duplicamos a lista para o efeito de loop infinito sem cortes
-  const loop = [...itens, ...itens]
+  // Triplicamos a lista para garantir loop sem qualquer "engasgo" visual
+  const loop = [...itens, ...itens, ...itens]
 
   return (
-    <div className="relative overflow-hidden group">
-      {/* Máscara lateral para fade nas bordas */}
+    <div className="relative overflow-hidden">
+      {/* Fade nas bordas para entrada e saída suave */}
       <div
-        className="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-32 z-10 bg-gradient-to-r from-card/30 via-card/30 to-transparent"
+        className="pointer-events-none absolute inset-y-0 left-0 w-20 md:w-40 z-10 bg-gradient-to-r from-background to-transparent"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-16 md:w-32 z-10 bg-gradient-to-l from-card/30 via-card/30 to-transparent"
+        className="pointer-events-none absolute inset-y-0 right-0 w-20 md:w-40 z-10 bg-gradient-to-l from-background to-transparent"
         aria-hidden="true"
       />
 
       <div
-        className="flex gap-4 md:gap-5 w-max animate-marquee group-hover:[animation-play-state:paused]"
+        className="flex gap-4 md:gap-6 w-max animate-marquee"
         style={{
           animationDuration: `${duracao}s`,
           animationDirection: reverso ? "reverse" : "normal",
@@ -61,18 +61,19 @@ function CarrosselTrilha({
         {loop.map((f, i) => (
           <div
             key={`${f.src}-${i}`}
-            className="relative w-[220px] h-[280px] md:w-[280px] md:h-[360px] flex-shrink-0 overflow-hidden rounded-2xl border border-border hover:border-primary/60 transition-colors"
+            className="relative w-[200px] h-[260px] md:w-[260px] md:h-[340px] flex-shrink-0 overflow-hidden rounded-2xl border border-border shadow-lg shadow-black/40"
           >
             <Image
               src={f.src || "/placeholder.svg"}
               alt={f.alt}
               fill
-              sizes="(max-width: 768px) 220px, 280px"
-              className="object-cover transition-transform duration-700 hover:scale-110"
+              sizes="(max-width: 768px) 200px, 260px"
+              className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
-              <p className="text-xs md:text-sm text-foreground font-medium">{f.alt}</p>
-            </div>
+            {/* Sombra inferior pra dar profundidade */}
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent" />
+            {/* Detalhe dourado no canto */}
+            <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-primary shadow-[0_0_12px_rgba(212,175,55,0.8)]" />
           </div>
         ))}
       </div>
@@ -98,7 +99,7 @@ export function Galeria() {
             Cortes que <span className="text-primary">contam história</span>
           </h2>
           <p className="mt-4 text-muted-foreground text-pretty">
-            Uma seleção de trabalhos feitos na cadeira do Alemão. Passe o mouse para pausar e inspire-se.
+            Uma seleção de trabalhos feitos na cadeira do Alemão.
           </p>
         </motion.div>
       </div>
@@ -108,10 +109,10 @@ export function Galeria() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.8 }}
-        className="space-y-4 md:space-y-5"
+        className="space-y-5 md:space-y-6"
       >
-        <CarrosselTrilha itens={trilha1} duracao={45} />
-        <CarrosselTrilha itens={trilha2} duracao={55} reverso />
+        <CarrosselTrilha itens={trilha1} duracao={28} />
+        <CarrosselTrilha itens={trilha2} duracao={32} reverso />
       </motion.div>
     </section>
   )

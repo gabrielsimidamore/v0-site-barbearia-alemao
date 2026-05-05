@@ -38,12 +38,20 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <h4 className="font-display text-lg tracking-wide text-foreground mb-3">Navegue</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#servicos" className="hover:text-primary">Serviços</a></li>
-              <li><a href="#galeria" className="hover:text-primary">Galeria</a></li>
-              <li><a href="#workshop" className="hover:text-primary">Workshop</a></li>
-              <li><a href="#contato" className="hover:text-primary">Contato</a></li>
+            <h4 className="font-display text-lg tracking-wide text-foreground mb-3">Horários</h4>
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              <li className="flex justify-between gap-4">
+                <span>Seg a Sexta</span>
+                <span className="text-foreground">9h — 19h30</span>
+              </li>
+              <li className="flex justify-between gap-4">
+                <span>Sábado</span>
+                <span className="text-foreground">8h — 13h</span>
+              </li>
+              <li className="flex justify-between gap-4">
+                <span>Domingo</span>
+                <span className="text-foreground">Curso</span>
+              </li>
             </ul>
             <p className="mt-4 text-sm text-foreground">{TELEFONE_FORMATADO}</p>
           </div>

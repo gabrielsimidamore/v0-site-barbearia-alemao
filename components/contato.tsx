@@ -5,10 +5,9 @@ import { MapPin, Phone, Clock, MessageCircle } from "lucide-react"
 import { ENDERECO, TELEFONE_FORMATADO, linkWhatsapp, MENSAGENS_WHATSAPP } from "@/lib/contato"
 
 const horarios = [
-  { dia: "Segunda", hora: "09h — 20h" },
-  { dia: "Terça a Sexta", hora: "09h — 21h" },
-  { dia: "Sábado", hora: "08h — 20h" },
-  { dia: "Domingo", hora: "Fechado" },
+  { dia: "Seg a Sexta", hora: "09h — 19h30" },
+  { dia: "Sábado", hora: "08h — 13h" },
+  { dia: "Domingo", hora: "Fechado*" },
 ]
 
 const enderecoMaps = encodeURIComponent(ENDERECO.completo)
@@ -128,6 +127,9 @@ export function Contato() {
                       </li>
                     ))}
                   </ul>
+                  <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed">
+                    *Domingos reservados para as turmas do curso (13h às 18h).
+                  </p>
                 </div>
               </div>
             </div>

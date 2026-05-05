@@ -1,44 +1,72 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Scissors, Sparkles, Baby, Crown, Brush, Droplet } from "lucide-react"
+import { Scissors, Sparkles, Baby, Crown, Brush, Wind, Eye, Footprints } from "lucide-react"
 import { linkWhatsapp, MENSAGENS_WHATSAPP } from "@/lib/contato"
 
 const servicos = [
   {
     icon: Scissors,
     titulo: "Corte Masculino",
+    preco: "R$ 40",
     descricao: "Cortes clássicos e modernos, do tradicional ao mais autoral, sempre com acabamento impecável.",
     destaque: false,
   },
   {
     icon: Sparkles,
     titulo: "Degradê / Fade",
+    preco: "R$ 40",
     descricao: "Degradês de baixa, média e alta — linhas precisas, transição suave e finalização caprichada.",
     destaque: true,
   },
   {
     icon: Brush,
-    titulo: "Barba na Navalha",
-    descricao: "Toalha quente, óleo, hidratação e desenho. A experiência completa para a barba dos sonhos.",
+    titulo: "Barba Completa",
+    preco: "R$ 35",
+    descricao:
+      "Não trabalho na toalha. Aplico 4 produtos em forma de massagem — um ritual que cuida da barba e da pele do cliente.",
     destaque: false,
   },
   {
     icon: Crown,
     titulo: "Combo Cabelo + Barba",
+    preco: "R$ 65",
     descricao: "O combo mais pedido. Você sai pronto pra qualquer ocasião com o melhor preço.",
     destaque: true,
   },
   {
-    icon: Baby,
-    titulo: "Corte Infantil",
-    descricao: "Atendimento paciente e ambiente acolhedor para os pequenos. Primeira ida, primeira memória.",
+    icon: Footprints,
+    titulo: "Pezinho",
+    preco: "R$ 20",
+    descricao: "Acabamento na nuca e contorno para manter o corte alinhado entre uma visita e outra.",
     destaque: false,
   },
   {
-    icon: Droplet,
-    titulo: "Platinado e Coloração",
-    descricao: "Descoloração, platinado, mechas e cores. Visual que chama atenção, feito por quem entende.",
+    icon: Wind,
+    titulo: "Relaxamento",
+    preco: "R$ 40",
+    descricao: "Tratamento que alinha os fios, reduz o volume e deixa o cabelo macio, com mais brilho e maleabilidade.",
+    destaque: false,
+  },
+  {
+    icon: Eye,
+    titulo: "Sobrancelha",
+    preco: "R$ 20",
+    descricao: "Design masculino que valoriza o olhar — limpeza e simetria sem exageros.",
+    destaque: false,
+  },
+  {
+    icon: Sparkles,
+    titulo: "Penteados",
+    preco: "Sob consulta",
+    descricao: "Finalização e penteado para eventos, casamentos e ocasiões especiais. Você sai impecável de cá.",
+    destaque: false,
+  },
+  {
+    icon: Baby,
+    titulo: "Corte Infantil",
+    preco: "Sob consulta",
+    descricao: "Atendimento paciente e ambiente acolhedor para os pequenos. Primeira ida, primeira memória.",
     destaque: false,
   },
 ]
@@ -91,9 +119,16 @@ export function Servicos() {
               >
                 <s.icon className="size-6" />
               </div>
-              <h3 className="font-display text-xl md:text-2xl tracking-wide text-foreground mb-2">
-                {s.titulo}
-              </h3>
+
+              <div className="flex items-baseline justify-between gap-3 mb-2">
+                <h3 className="font-display text-xl md:text-2xl tracking-wide text-foreground">
+                  {s.titulo}
+                </h3>
+                <span className="font-display text-lg md:text-xl tracking-wider text-primary shrink-0">
+                  {s.preco}
+                </span>
+              </div>
+
               <p className="text-sm text-muted-foreground leading-relaxed">{s.descricao}</p>
               <div className="mt-5 pt-4 border-t border-border/60">
                 <a
@@ -117,6 +152,9 @@ export function Servicos() {
           viewport={{ once: true }}
           className="mt-12 text-center"
         >
+          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">
+            Tabela de preços fixa — sem surpresas
+          </p>
           <a
             href={linkWhatsapp(MENSAGENS_WHATSAPP.agendamento)}
             target="_blank"

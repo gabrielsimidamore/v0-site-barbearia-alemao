@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { GraduationCap, Check, MessageCircle } from "lucide-react"
+import { GraduationCap, Check, MessageCircle, Calendar, Clock, Award } from "lucide-react"
 import { linkWhatsapp, MENSAGENS_WHATSAPP } from "@/lib/contato"
 
 const beneficios = [
@@ -12,6 +12,24 @@ const beneficios = [
   "Material de apoio + certificado",
   "Turmas reduzidas para atenção individual",
   "Suporte pós-curso para tirar dúvidas",
+]
+
+const detalhes = [
+  {
+    icon: Calendar,
+    label: "Duração",
+    valor: "4 Domingos",
+  },
+  {
+    icon: Clock,
+    label: "Horário",
+    valor: "13h às 18h",
+  },
+  {
+    icon: Award,
+    label: "Certificado",
+    valor: "Válido nível Brasil",
+  },
 ]
 
 export function Workshop() {
@@ -83,6 +101,24 @@ export function Workshop() {
               degradê preciso ao toque final na navalha. Ideal para iniciantes e barbeiros que
               querem evoluir.
             </p>
+
+            {/* Card destacando estrutura do curso */}
+            <div className="mt-7 grid grid-cols-3 gap-3">
+              {detalhes.map((d) => (
+                <div
+                  key={d.label}
+                  className="rounded-2xl border border-primary/30 bg-card/70 backdrop-blur-sm p-4 text-center"
+                >
+                  <d.icon className="size-5 text-primary mx-auto mb-2" />
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {d.label}
+                  </div>
+                  <div className="mt-1 font-display text-base md:text-lg tracking-wide text-foreground leading-tight">
+                    {d.valor}
+                  </div>
+                </div>
+              ))}
+            </div>
 
             <ul className="mt-7 grid sm:grid-cols-2 gap-3">
               {beneficios.map((b, i) => (

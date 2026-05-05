@@ -4,20 +4,20 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 
 const fotos = [
-  { src: "/cortes/corte-1.png", alt: "Corte fade alto com linha lateral" },
-  { src: "/cortes/corte-11.png", alt: "Corte infantil com risco lateral e degradê" },
-  { src: "/cortes/corte-3.png", alt: "Degradê cabelo + barba" },
-  { src: "/cortes/corte-13.png", alt: "Degradê com barba alinhada" },
-  { src: "/cortes/corte-12.png", alt: "Mullet masculino com fade" },
-  { src: "/cortes/corte-2.png", alt: "Tranças com fade" },
-  { src: "/cortes/corte-7.png", alt: "Corte infantil estilo executivo" },
-  { src: "/cortes/corte-14.png", alt: "Mullet cacheado com degradê" },
-  { src: "/cortes/corte-9.png", alt: "Buzz cut com fade alto" },
-  { src: "/cortes/corte-15.png", alt: "Mullet com risco lateral" },
-  { src: "/cortes/corte-4.png", alt: "Corte com degradê platinado" },
-  { src: "/cortes/corte-8.png", alt: "Corte clássico longo no topo" },
-  { src: "/cortes/corte-10.png", alt: "Corte cacheado com fade" },
-  { src: "/cortes/corte-6.png", alt: "Corte social com fade lateral" },
+  { src: "/cortes/corte-1.png", alt: "Corte fade alto com linha lateral feito na Barbearia do Alemão em Novo Osasco" },
+  { src: "/cortes/corte-11.png", alt: "Corte infantil com risco lateral e degradê em Osasco" },
+  { src: "/cortes/corte-3.png", alt: "Corte degradê com barba completa - Barbearia do Alemão Osasco" },
+  { src: "/cortes/corte-13.png", alt: "Degradê com barba alinhada feita na navalha em Novo Osasco" },
+  { src: "/cortes/corte-12.png", alt: "Corte mullet masculino com fade na Barbearia do Alemão" },
+  { src: "/cortes/corte-2.png", alt: "Tranças masculinas com fade em Osasco" },
+  { src: "/cortes/corte-7.png", alt: "Corte infantil estilo social na Barbearia do Alemão" },
+  { src: "/cortes/corte-14.png", alt: "Mullet cacheado com degradê em Novo Osasco" },
+  { src: "/cortes/corte-9.png", alt: "Buzz cut com fade alto - barbearia em Osasco" },
+  { src: "/cortes/corte-15.png", alt: "Corte mullet com risco lateral na Barbearia do Alemão" },
+  { src: "/cortes/corte-4.png", alt: "Corte masculino com degradê platinado em Osasco" },
+  { src: "/cortes/corte-8.png", alt: "Corte clássico com volume no topo na Barbearia do Alemão" },
+  { src: "/cortes/corte-10.png", alt: "Corte cacheado masculino com fade em Novo Osasco" },
+  { src: "/cortes/corte-6.png", alt: "Corte social com fade lateral feito pelo Alemão em Osasco" },
 ]
 
 // Divide em duas trilhas com sentidos opostos para sensação de fluxo dinâmico

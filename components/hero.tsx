@@ -120,10 +120,10 @@ export function Hero() {
               {/* Foto principal */}
               <div className="relative h-full w-full overflow-hidden rounded-3xl border-2 border-primary/30 shadow-2xl">
                 <Image
-                  src="/cortes/corte-3.png"
-                  alt="Corte degradê com barba feito na Barbearia do Alemão"
+                  src="/cortes/corte-kids.png"
+                  alt="Corte kids infantil feito na Barbearia do Alemão em Osasco"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top"
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />

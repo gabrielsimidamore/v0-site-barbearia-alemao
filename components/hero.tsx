@@ -124,7 +124,7 @@ export function Hero() {
                   alt="Corte kids infantil feito na Barbearia do Alemão em Osasco"
                   fill
                   className="object-cover"
-                  style={{ objectPosition: "center 25%" }}
+                  style={{ objectPosition: "center 10%" }}
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />

@@ -103,7 +103,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="relative aspect-[4/5] max-w-md mx-auto">
+            <div className="relative aspect-[3/4] max-w-md mx-auto">
               {/* Logo flutuante */}
               <motion.div
                 className="absolute -top-6 -right-6 z-20 size-28 md:size-36 float-anim"
@@ -124,7 +124,7 @@ export function Hero() {
                   alt="Corte kids infantil feito na Barbearia do Alemão em Osasco"
                   fill
                   className="object-cover"
-                  style={{ objectPosition: "center 15%" }}
+                  style={{ objectPosition: "center 38%" }}
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />

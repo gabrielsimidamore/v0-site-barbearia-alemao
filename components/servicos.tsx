@@ -69,13 +69,6 @@ const servicos = [
     descricao: "Atendimento paciente e ambiente acolhedor para os pequenos. Primeira ida, primeira memória.",
     destaque: false,
   },
-  {
-    icon: Baby,
-    titulo: "Corte Kids",
-    preco: "R$ 40",
-    descricao: "Corte especial para crianças com acabamento caprichado, risquinho e degradê — os pequenos saem estilosos!",
-    destaque: true,
-  },
 ]
 
 export function Servicos() {

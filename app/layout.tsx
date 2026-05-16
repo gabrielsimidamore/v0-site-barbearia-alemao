@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { DM_Sans, Bebas_Neue } from "next/font/google"
+import { DM_Sans, Bebas_Neue, Cormorant_Garamond, DM_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
@@ -13,6 +13,21 @@ const bebas = Bebas_Neue({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-display-custom",
+  display: "swap",
+})
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-serif-custom",
+  display: "swap",
+})
+
+const dmMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-mono-custom",
   display: "swap",
 })
 
@@ -115,7 +130,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" className={`${dmSans.variable} ${bebas.variable} bg-background`}>
+    <html lang="pt-BR" className={`${dmSans.variable} ${bebas.variable} ${cormorant.variable} ${dmMono.variable} bg-background`}>
       <head>
         <link rel="canonical" href={SITE_URL} />
         <meta name="geo.region" content="BR-SP" />

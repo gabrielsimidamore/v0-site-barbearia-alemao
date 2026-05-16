@@ -154,3 +154,89 @@ body::after {
   animation-iteration-count: infinite;
   will-change: transform;
 }
+
+/* ── Serif & Mono font vars ─────────────────────────────── */
+@theme inline {
+  --font-serif: var(--font-serif-custom), 'Georgia', serif;
+  --font-mono: var(--font-mono-custom), 'Courier New', monospace;
+}
+
+/* ── Custom scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: oklch(0.78 0.14 82 / 0.6);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: oklch(0.78 0.14 82); }
+
+/* ── Hide default cursor on desktop ─────────────────────── */
+@media (pointer: fine) {
+  *, *::before, *::after { cursor: none !important; }
+}
+
+/* ── Text reveal mask ────────────────────────────────────── */
+.reveal-wrap { overflow: hidden; display: block; }
+
+/* ── 3D Tilt card ────────────────────────────────────────── */
+.tilt-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.1s ease;
+}
+.tilt-card:not(:hover) {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg) !important;
+}
+
+/* ── Diagonal gold line decorative ──────────────────────── */
+.gold-line {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.78 0.14 82 / 0.4) 30%,
+    oklch(0.78 0.14 82 / 0.8) 50%,
+    oklch(0.78 0.14 82 / 0.4) 70%,
+    transparent 100%
+  );
+}
+
+/* ── Clip diagonal ───────────────────────────────────────── */
+.clip-diagonal {
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
+}
+.clip-diagonal-reverse {
+  clip-path: polygon(0 0, 100% 4%, 100% 100%, 0 100%);
+}
+
+/* ── Text stroke gold ────────────────────────────────────── */
+.text-stroke-gold {
+  -webkit-text-stroke: 1px oklch(0.78 0.14 82 / 0.5);
+  color: transparent;
+}
+
+/* ── Oversize heading ────────────────────────────────────── */
+.text-fluid-hero {
+  font-size: clamp(4rem, 16vw, 14rem);
+  line-height: 0.88;
+}
+.text-fluid-serif {
+  font-size: clamp(2rem, 7vw, 6rem);
+  line-height: 0.9;
+}
+
+/* ── Scroll indicator animation ─────────────────────────── */
+@keyframes scrollDown {
+  0% { transform: translateY(-100%); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+.scroll-indicator-line {
+  animation: scrollDown 1.8s ease-in-out infinite;
+}
+
+/* ── Button magnetic transition ─────────────────────────── */
+.btn-magnetic {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}

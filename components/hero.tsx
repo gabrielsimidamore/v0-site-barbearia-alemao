@@ -10,7 +10,11 @@ import { linkWhatsapp, MENSAGENS_WHATSAPP } from "@/lib/contato"
 const rev = (delay = 0) => ({
   initial: { y: "105%", opacity: 0 },
   animate: { y: "0%", opacity: 1 },
-  transition: { duration: 1, ease: [0.16, 1, 0.3, 1], delay },
+  transition: {
+    duration: 1,
+    ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+    delay,
+  },
 })
 
 /* ── magnetic button ──────────────────── */

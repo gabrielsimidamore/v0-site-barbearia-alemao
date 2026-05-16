@@ -9,6 +9,7 @@ import { FAQ } from "@/components/faq"
 import { Contato } from "@/components/contato"
 import { SiteFooter } from "@/components/site-footer"
 import { WhatsappFloat } from "@/components/whatsapp-float"
+import { MobileBar } from "@/components/mobile-bar"
 import { StructuredData } from "@/components/structured-data"
 import { SmoothScroll } from "@/components/smooth-scroll"
 import { CustomCursor } from "@/components/cursor"
@@ -17,7 +18,8 @@ export default function Home() {
   return (
     <SmoothScroll>
       <CustomCursor />
-      <main className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* pb-20 md:pb-0 garante que o conteúdo não fique atrás da barra mobile */}
+      <main className="relative min-h-screen bg-background text-foreground overflow-x-hidden pb-20 md:pb-0">
         <StructuredData />
         <SiteHeader />
         <Hero />
@@ -31,6 +33,7 @@ export default function Home() {
         <Contato />
         <SiteFooter />
         <WhatsappFloat />
+        <MobileBar />
       </main>
     </SmoothScroll>
   )

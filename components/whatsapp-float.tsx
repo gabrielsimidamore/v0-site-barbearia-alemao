@@ -13,7 +13,7 @@ export function WhatsappFloat() {
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 1.2, type: "spring", stiffness: 200 }}
-      className="fixed bottom-5 right-5 z-50 inline-flex items-center justify-center size-14 md:size-16 rounded-full bg-accent text-accent-foreground shadow-2xl shadow-accent/40 pulse-ring hover:scale-110 transition-transform"
+      className="fixed bottom-5 right-5 z-50 hidden md:inline-flex items-center justify-center size-16 rounded-full bg-accent text-accent-foreground shadow-2xl shadow-accent/40 pulse-ring hover:scale-110 transition-transform"
     >
       <svg
         viewBox="0 0 24 24"

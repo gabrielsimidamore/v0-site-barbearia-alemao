@@ -240,3 +240,34 @@ body::after {
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
 }
+
+/* ── Mobile-first utilities ──────────────────────────────── */
+
+/* Touch target mínimo de 44px (WCAG + Apple HIG) */
+@media (pointer: coarse) {
+  a, button { min-height: 44px; }
+}
+
+/* Scroll horizontal snapping — serviços mobile */
+.snap-scroll-x {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+.snap-scroll-x::-webkit-scrollbar { display: none; }
+.snap-item {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Tap highlight transparente */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Safe area bottom para conteúdo fixo (iPhone notch/home indicator) */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

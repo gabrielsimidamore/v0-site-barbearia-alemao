@@ -102,16 +102,15 @@ export function Workshop() {
               querem evoluir.
             </p>
 
-            {/* Preço em destaque */}
-            <div className="mt-6 inline-flex items-center gap-4 rounded-2xl border border-primary/40 bg-primary/10 px-6 py-4">
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Investimento</div>
-                <div className="font-display text-4xl tracking-wider text-primary gold-shimmer">R$ 497</div>
-              </div>
-              <div className="w-px h-10 bg-primary/20" />
-              <div className="text-sm text-muted-foreground leading-relaxed">
-                Parcelamento<br />disponível no PIX
-              </div>
+            {/* Preço em breve */}
+            <div className="mt-6 inline-flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/5 px-5 py-3">
+              <span className="size-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-sm text-muted-foreground">
+                Valores e datas das próximas turmas —
+                <a href={linkWhatsapp("Olá! Tenho interesse no workshop de barbearia. Pode me passar os valores e próximas datas?")} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">
+                  consulte pelo WhatsApp
+                </a>
+              </span>
             </div>
 
             {/* Card destacando estrutura do curso */}

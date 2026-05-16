@@ -1,203 +1,306 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { motion, useMotionValue, useSpring } from "framer-motion"
+import { useEffect, useRef } from "react"
 
-const TRAIL = 36
+// ── Física da corda (Verlet integration) ─────────────
+const N        = 26     // nós da corda
+const SEG      = 18     // comprimento em repouso entre nós (px)
+const GRAVITY  = 0.55   // gravidade por frame
+const DAMPING  = 0.975  // amortecimento (quanto frena)
+const ITERS    = 22     // iterações de constraint por frame
 
-function cordPath(pts: { x: number; y: number }[]): string {
-  if (pts.length < 2) return ""
-  // Offset: o fio sai da traseira (baixo) da máquina
-  const start = { x: pts[0].x, y: pts[0].y + 52 }
-  let d = `M ${start.x} ${start.y}`
-  for (let i = 1; i < pts.length - 1; i++) {
-    const ox = pts[i].x
-    const oy = pts[i].y + Math.max(0, 52 - i * 1.8) // fio vai subindo gradualmente
-    const nx = (ox + pts[i + 1].x) / 2
-    const ny = (oy + pts[i + 1].y + Math.max(0, 52 - (i + 1) * 1.8)) / 2
-    d += ` Q ${ox} ${oy} ${nx} ${ny}`
-  }
-  const last = pts[pts.length - 1]
-  d += ` L ${last.x} ${last.y}`
-  return d
+interface Node { x:number; y:number; px:number; py:number; pinned?:boolean }
+
+function makeNodes(ax:number, ay:number, tx:number, ty:number): Node[] {
+  return Array.from({ length: N + 1 }, (_, i) => {
+    const t = i / N
+    return { x: ax + (tx-ax)*t, y: ay + (ty-ay)*t + Math.sin(t*Math.PI)*60,
+             px: ax + (tx-ax)*t, py: ay + (ty-ay)*t + Math.sin(t*Math.PI)*60 }
+  })
 }
 
-/* ── Wahl Classic — vista de cima ─── */
-function WahlClipper({ scale = 1 }: { scale?: number }) {
-  const g = "oklch(0.78 0.14 82)"        // dourado sólido
-  const gf = "oklch(0.78 0.14 82 / 0.18)" // dourado fundo
-  const gm = "oklch(0.78 0.14 82 / 0.40)" // dourado médio
+function step(nodes: Node[], ax:number, ay:number, tx:number, ty:number) {
+  // Verlet
+  for (let i = 1; i < nodes.length - 1; i++) {
+    const n = nodes[i]
+    const vx = (n.x - n.px) * DAMPING
+    const vy = (n.y - n.py) * DAMPING
+    n.px = n.x; n.py = n.y
+    n.x += vx; n.y += vy + GRAVITY
+  }
+  // Constraints
+  for (let iter = 0; iter < ITERS; iter++) {
+    for (let i = 0; i < nodes.length - 1; i++) solve(nodes[i], nodes[i+1])
+    for (let i = nodes.length - 1; i > 0; i--) solve(nodes[i], nodes[i-1])
+    // Fixar âncora e ponta
+    nodes[0].x = ax; nodes[0].y = ay
+    nodes[nodes.length-1].x = tx; nodes[nodes.length-1].y = ty
+  }
+}
 
+function solve(a: Node, b: Node) {
+  const dx = b.x - a.x, dy = b.y - a.y
+  const d  = Math.hypot(dx, dy) || .001
+  const f  = (d - SEG) / d * .5
+  if (!a.pinned) { a.x += dx*f; a.y += dy*f }
+  if (!b.pinned) { b.x -= dx*f; b.y -= dy*f }
+}
+
+function toPath(nodes: Node[]): string {
+  if (nodes.length < 2) return ""
+  let d = `M ${nodes[0].x.toFixed(1)} ${nodes[0].y.toFixed(1)}`
+  for (let i = 1; i < nodes.length - 1; i++) {
+    const mx = ((nodes[i].x + nodes[i+1].x)/2).toFixed(1)
+    const my = ((nodes[i].y + nodes[i+1].y)/2).toFixed(1)
+    d += ` Q ${nodes[i].x.toFixed(1)} ${nodes[i].y.toFixed(1)} ${mx} ${my}`
+  }
+  const L = nodes[nodes.length-1]
+  return d + ` L ${L.x.toFixed(1)} ${L.y.toFixed(1)}`
+}
+
+// ── Máquina Wahl (SVG realista, vista de cima) ────────
+function Wahl() {
   return (
-    <svg
-      width={42 * scale}
-      height={62 * scale}
-      viewBox="0 0 42 62"
-      fill="none"
+    <svg width="52" height="82" viewBox="0 0 52 82" fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ filter: "drop-shadow(0 0 8px oklch(0.78 0.14 82 / 0.7))" }}
+      style={{ filter:"drop-shadow(0 4px 12px rgba(0,0,0,0.7)) drop-shadow(0 0 6px oklch(0.78 0.14 82 / 0.5))" }}
       aria-hidden="true"
     >
-      {/* ── Dentes da lâmina (topo) ── */}
-      {[6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36].map((tx) => (
-        <line key={tx} x1={tx} y1="0" x2={tx} y2="6"
-          stroke={g} strokeWidth="1.3" strokeLinecap="round" />
+      <defs>
+        <linearGradient id="wbody" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stopColor="#3d3018"/>
+          <stop offset="35%"  stopColor="#1e180a"/>
+          <stop offset="100%" stopColor="#0d0b05"/>
+        </linearGradient>
+        <linearGradient id="wblade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#d0cec8"/>
+          <stop offset="100%" stopColor="#888680"/>
+        </linearGradient>
+        <linearGradient id="wswitch" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#2a2010"/>
+          <stop offset="100%" stopColor="#0a0804"/>
+        </linearGradient>
+      </defs>
+
+      {/* Dentes da lâmina */}
+      {[5,8,11,14,17,20,23,26,29,32,35,38,41,44,47].map(tx=>(
+        <line key={tx} x1={tx} y1="0" x2={tx} y2="8"
+          stroke="#aaa9a3" strokeWidth="1.2" strokeLinecap="round"/>
       ))}
 
-      {/* ── Guarda da lâmina ── */}
-      <rect x="4" y="5" width="34" height="9" rx="2.5"
-        fill={gm} stroke={g} strokeWidth="1.4" />
+      {/* Guarda da lâmina (aço) */}
+      <rect x="2" y="6" width="48" height="13" rx="3"
+        fill="url(#wblade)" stroke="#777570" strokeWidth="1"/>
+      <line x1="2" y1="13" x2="50" y2="13"
+        stroke="#c0bebA" strokeWidth="0.6" opacity="0.6"/>
 
-      {/* ── Corpo principal (trapézio — estreito no topo, largo na base) ── */}
-      <path
-        d="M 6 14 C 4 22 2 34 3 50 L 39 50 C 40 34 38 22 36 14 Z"
-        fill={gf} stroke={g} strokeWidth="1.5"
-      />
+      {/* Corpo principal — forma Wahl (trapézio arredondado) */}
+      <path d="M 6 18 C 3 18 1 20 1 24 L 1 62 C 1 70 7 78 14 80 L 26 82 L 38 80 C 45 78 51 70 51 62 L 51 24 C 51 20 49 18 46 18 Z"
+        fill="url(#wbody)" stroke="oklch(0.78 0.14 82)" strokeWidth="1.5"/>
 
-      {/* ── Interruptor lateral esquerdo ── */}
-      <rect x="0" y="24" width="5" height="14" rx="2.5"
-        fill={gm} stroke={g} strokeWidth="1.2" />
-      {/* Bolinha do switch */}
-      <circle cx="2.5" cy="29" r="2" fill={g} />
+      {/* Reflexo luz lateral esquerda */}
+      <path d="M 8 22 C 5 26 4 32 4 38 L 4 56"
+        stroke="rgba(255,220,120,0.10)" strokeWidth="4"
+        strokeLinecap="round" fill="none"/>
 
-      {/* ── Parafusos ── */}
-      <circle cx="21" cy="26" r="2.2" stroke={g} strokeWidth="1" fill={gf} />
-      <line x1="19.5" y1="26" x2="22.5" y2="26" stroke={g} strokeWidth="0.8" />
-      <line x1="21" y1="24.5" x2="21" y2="27.5" stroke={g} strokeWidth="0.8" />
+      {/* Interruptor lateral esquerdo */}
+      <rect x="-3" y="32" width="8" height="20" rx="4"
+        fill="url(#wswitch)" stroke="oklch(0.78 0.14 82)" strokeWidth="1.2"/>
+      {/* Posição do switch (ON) */}
+      <rect x="-1" y="35" width="4" height="7" rx="2"
+        fill="oklch(0.78 0.14 82)"/>
 
-      <circle cx="21" cy="43" r="2.2" stroke={g} strokeWidth="1" fill={gf} />
-      <line x1="19.5" y1="43" x2="22.5" y2="43" stroke={g} strokeWidth="0.8" />
-      <line x1="21" y1="41.5" x2="21" y2="44.5" stroke={g} strokeWidth="0.8" />
+      {/* Área de logo */}
+      <rect x="13" y="28" width="26" height="16" rx="3"
+        fill="rgba(212,175,55,0.06)"
+        stroke="oklch(0.78 0.14 82 / 0.25)" strokeWidth="0.8"/>
+      {/* WAHL texto simplificado como linhas */}
+      <line x1="17" y1="33" x2="17" y2="40" stroke="oklch(0.78 0.14 82 / 0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="17" y1="40" x2="20" y2="36" stroke="oklch(0.78 0.14 82 / 0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="20" y1="36" x2="23" y2="40" stroke="oklch(0.78 0.14 82 / 0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="23" y1="40" x2="23" y2="33" stroke="oklch(0.78 0.14 82 / 0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="26" y1="33" x2="26" y2="40" stroke="oklch(0.78 0.14 82 / 0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="26" y1="33" x2="29" y2="33" stroke="oklch(0.78 0.14 82 / 0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="26" y1="37" x2="28" y2="37" stroke="oklch(0.78 0.14 82 / 0.5)" strokeWidth="1.2" strokeLinecap="round"/>
 
-      {/* ── Saída do fio (traseira / parte de baixo) ── */}
-      <rect x="14" y="49" width="14" height="7" rx="3.5"
-        fill={gm} stroke={g} strokeWidth="1.3" />
-      <rect x="17" y="55" width="8" height="5" rx="2"
-        fill={gm} stroke={g} strokeWidth="1.2" />
-      {/* Ponto de entrada do fio */}
-      <circle cx="21" cy="60" r="2.5" fill={g} />
+      {/* Parafuso 1 */}
+      <circle cx="26" cy="55" r="3" fill="#0a0804" stroke="oklch(0.78 0.14 82)" strokeWidth="1"/>
+      <line x1="23.8" y1="55" x2="28.2" y2="55" stroke="oklch(0.78 0.14 82)" strokeWidth="0.8"/>
+      <line x1="26" y1="52.8" x2="26" y2="57.2" stroke="oklch(0.78 0.14 82)" strokeWidth="0.8"/>
+
+      {/* Saída do fio — canto inferior */}
+      <ellipse cx="26" cy="80" rx="9" ry="5"
+        fill="#0a0804" stroke="oklch(0.78 0.14 82)" strokeWidth="1.3"/>
+      {/* Encaixe do fio */}
+      <circle cx="26" cy="81" r="4"
+        fill="oklch(0.78 0.14 82 / 0.3)" stroke="oklch(0.78 0.14 82)" strokeWidth="1"/>
+      <circle cx="26" cy="81" r="1.5" fill="oklch(0.78 0.14 82)"/>
     </svg>
   )
 }
 
+// ── Tomada (âncora fixa canto inferior direito) ──────
+function Socket({ x, y }: { x:number; y:number }) {
+  const g = "oklch(0.78 0.14 82)"
+  return (
+    <g transform={`translate(${x-18},${y-18})`} style={{ pointerEvents:"none" }}>
+      {/* Caixa da tomada */}
+      <rect x="0" y="0" width="36" height="28" rx="6"
+        fill="#0d0b05" stroke={g} strokeWidth="1.4"/>
+      {/* Pinos */}
+      <rect x="8"  y="8" width="5" height="12" rx="2.5"
+        fill="none" stroke={g} strokeWidth="1.2"/>
+      <rect x="23" y="8" width="5" height="12" rx="2.5"
+        fill="none" stroke={g} strokeWidth="1.2"/>
+      {/* LED indicador */}
+      <circle cx="18" cy="20" r="2" fill={g} opacity="0.6"/>
+    </g>
+  )
+}
+
+// ── Componente principal ──────────────────────────────
 export function CustomCursor() {
-  const [visible, setVisible] = useState(false)
-  const [scale, setScale] = useState(1)
-
-  const mouseX = useMotionValue(-300)
-  const mouseY = useMotionValue(-300)
-  const x = useSpring(mouseX, { stiffness: 350, damping: 25, mass: 0.6 })
-  const y = useSpring(mouseY, { stiffness: 350, damping: 25, mass: 0.6 })
-
-  const trailRef = useRef<{ x: number; y: number }[]>([])
-  const pathRef = useRef<SVGPathElement | null>(null)
+  const svgRef    = useRef<SVGSVGElement>(null)
+  const pathRef   = useRef<SVGPathElement>(null)
+  const clipRef   = useRef<HTMLDivElement>(null)
+  const socketRef = useRef<SVGGElement>(null)
+  const nodes     = useRef<Node[]>([])
+  const cursor    = useRef({ x: 0, y: 0 })
+  const anchor    = useRef({ x: 0, y: 0 })
+  const raf       = useRef<number>(0)
+  const ready     = useRef(false)
 
   useEffect(() => {
-    // ── MOUSE (desktop) ──────────────────
+    const W = window.innerWidth
+    const H = window.innerHeight
+
+    const ax = W - 36
+    const ay = H - 36
+    anchor.current = { x: ax, y: ay }
+
+    // Máquina começa no centro da tela
+    cursor.current = { x: W * 0.5, y: H * 0.35 }
+    nodes.current  = makeNodes(ax, ay, cursor.current.x, cursor.current.y)
+    ready.current  = true
+
+    // Posiciona o socket no SVG
+    if (socketRef.current) {
+      socketRef.current.setAttribute("transform", `translate(${ax-18},${ay-18})`)
+    }
+
+    // ── Loop de física ─────────────────────────────
+    function loop() {
+      const { x, y } = cursor.current
+      const { x:ax2, y:ay2 } = anchor.current
+      step(nodes.current, ax2, ay2, x, y)
+
+      const d = toPath(nodes.current)
+
+      // Atualiza todas as camadas da corda via DOM direto
+      if (pathRef.current) pathRef.current.setAttribute("d", d)
+      const main  = svgRef.current?.querySelector("#cord-main")
+      const shine = svgRef.current?.querySelector("#cord-shine")
+      if (main)  main.setAttribute("d", d)
+      if (shine) shine.setAttribute("d", d)
+
+      // Atualiza posição da máquina
+      if (clipRef.current)
+        clipRef.current.style.transform =
+          `translate(${(x - 26).toFixed(1)}px, ${(y - 4).toFixed(1)}px)`
+
+      raf.current = requestAnimationFrame(loop)
+    }
+    raf.current = requestAnimationFrame(loop)
+
+    // ── Mouse ──────────────────────────────────────
     const onMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX)
-      mouseY.set(e.clientY)
-      if (!visible) setVisible(true)
-      updateTrail(e.clientX, e.clientY)
-    }
-    const onDown = () => setScale(0.85)
-    const onUp = () => setScale(1)
-
-    const onOver = (e: MouseEvent) => {
-      const t = e.target as HTMLElement
-      setScale(t.closest("a") || t.closest("button") ? 1.15 : 1)
+      cursor.current = { x: e.clientX, y: e.clientY }
     }
 
-    // ── TOUCH (mobile) ───────────────────
-    const onTouchStart = (e: TouchEvent) => {
+    // ── Touch ──────────────────────────────────────
+    const onTouch = (e: TouchEvent) => {
       const t = e.touches[0]
-      if (!t) return
-      mouseX.set(t.clientX)
-      mouseY.set(t.clientY)
-      setVisible(true)
-      setScale(0.9)
-      updateTrail(t.clientX, t.clientY)
-    }
-    const onTouchMove = (e: TouchEvent) => {
-      const t = e.touches[0]
-      if (!t) return
-      mouseX.set(t.clientX)
-      mouseY.set(t.clientY)
-      updateTrail(t.clientX, t.clientY)
-    }
-    const onTouchEnd = () => {
-      setScale(1)
-      // Limpa o fio ao soltar
-      setTimeout(() => {
-        trailRef.current = []
-        if (pathRef.current) pathRef.current.setAttribute("d", "")
-      }, 400)
+      if (t) cursor.current = { x: t.clientX, y: t.clientY }
     }
 
-    function updateTrail(cx: number, cy: number) {
-      trailRef.current = [{ x: cx, y: cy }, ...trailRef.current].slice(0, TRAIL)
-      if (pathRef.current && trailRef.current.length > 1) {
-        pathRef.current.setAttribute("d", cordPath(trailRef.current))
+    // ── Resize ─────────────────────────────────────
+    const onResize = () => {
+      anchor.current = { x: window.innerWidth - 36, y: window.innerHeight - 36 }
+      if (socketRef.current) {
+        const { x, y } = anchor.current
+        socketRef.current.setAttribute("transform", `translate(${x-18},${y-18})`)
       }
     }
 
     window.addEventListener("mousemove", onMove)
-    window.addEventListener("mousedown", onDown)
-    window.addEventListener("mouseup", onUp)
-    window.addEventListener("mouseover", onOver)
-    window.addEventListener("touchstart", onTouchStart, { passive: true })
-    window.addEventListener("touchmove", onTouchMove, { passive: true })
-    window.addEventListener("touchend", onTouchEnd)
+    window.addEventListener("touchstart", onTouch, { passive:true })
+    window.addEventListener("touchmove",  onTouch, { passive:true })
+    window.addEventListener("resize", onResize)
 
     return () => {
+      if (raf.current) cancelAnimationFrame(raf.current)
       window.removeEventListener("mousemove", onMove)
-      window.removeEventListener("mousedown", onDown)
-      window.removeEventListener("mouseup", onUp)
-      window.removeEventListener("mouseover", onOver)
-      window.removeEventListener("touchstart", onTouchStart)
-      window.removeEventListener("touchmove", onTouchMove)
-      window.removeEventListener("touchend", onTouchEnd)
+      window.removeEventListener("touchstart", onTouch)
+      window.removeEventListener("touchmove",  onTouch)
+      window.removeEventListener("resize", onResize)
     }
-  }, [mouseX, mouseY, visible])
-
-  if (!visible) return null
+  }, [])
 
   return (
     <>
-      {/* Fio da máquina — SVG full viewport */}
+      {/* SVG overlay — corda + tomada */}
       <svg
+        ref={svgRef}
         className="fixed inset-0 pointer-events-none z-[9997]"
-        style={{ width: "100vw", height: "100vh", top: 0, left: 0 }}
+        style={{ width:"100vw", height:"100vh" }}
         aria-hidden="true"
       >
         <defs>
-          <linearGradient id="fio" gradientUnits="userSpaceOnUse"
+          {/* Gradiente de opacidade longo ao longo da corda */}
+          <linearGradient id="cordGrad" gradientUnits="userSpaceOnUse"
             x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="oklch(0.78 0.14 82)" stopOpacity="0.7" />
-            <stop offset="50%" stopColor="oklch(0.78 0.14 82)" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="oklch(0.78 0.14 82)" stopOpacity="0" />
+            <stop offset="0%"   stopColor="#2a1e0a" stopOpacity="0.9"/>
+            <stop offset="100%" stopColor="#2a1e0a" stopOpacity="0.7"/>
           </linearGradient>
         </defs>
-        <path
-          ref={pathRef}
-          d=""
-          stroke="oklch(0.78 0.14 82 / 0.55)"
-          strokeWidth="2.5"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+
+        {/* Corda — borda escura (espessura) */}
+        <path ref={pathRef} d=""
+          stroke="#0a0804"
+          strokeWidth="5"
+          fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        {/* Corda — camada principal */}
+        <path d="" id="cord-main"
+          stroke="#2a1e0a"
+          strokeWidth="3.5"
+          fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        {/* Corda — reflexo (brilho sutil) */}
+        <path d="" id="cord-shine"
+          stroke="oklch(0.78 0.14 82 / 0.18)"
+          strokeWidth="1.5"
+          fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+
+        {/* Tomada fixa */}
+        <g ref={socketRef} style={{ pointerEvents:"none" }}>
+          <rect x="0" y="0" width="36" height="28" rx="6"
+            fill="#0d0b05" stroke="oklch(0.78 0.14 82)" strokeWidth="1.4"/>
+          <rect x="8"  y="8" width="5" height="12" rx="2.5"
+            fill="none" stroke="oklch(0.78 0.14 82)" strokeWidth="1.2"/>
+          <rect x="23" y="8" width="5" height="12" rx="2.5"
+            fill="none" stroke="oklch(0.78 0.14 82)" strokeWidth="1.2"/>
+          <circle cx="18" cy="20" r="2"
+            fill="oklch(0.78 0.14 82)" opacity="0.7"/>
+        </g>
       </svg>
 
-      {/* Máquina — blade (topo) alinhada ao ponto do cursor */}
-      <motion.div
+      {/* Máquina — posicionada via transform direto */}
+      <div
+        ref={clipRef}
         className="fixed top-0 left-0 z-[9999] pointer-events-none"
-        style={{ x, y, translateX: "-50%", translateY: "0%" }}
+        style={{ willChange:"transform" }}
       >
-        <motion.div animate={{ scale }} transition={{ duration: 0.15 }}>
-          <WahlClipper />
-        </motion.div>
-      </motion.div>
+        <Wahl />
+      </div>
     </>
   )
 }

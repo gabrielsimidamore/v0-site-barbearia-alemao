@@ -160,53 +160,55 @@ function Socket({ x, y }: { x:number; y:number }) {
 
 // ── Componente principal ──────────────────────────────
 export function CustomCursor() {
-  const svgRef    = useRef<SVGSVGElement>(null)
-  const pathRef   = useRef<SVGPathElement>(null)
-  const clipRef   = useRef<HTMLDivElement>(null)
-  const socketRef = useRef<SVGGElement>(null)
-  const nodes     = useRef<Node[]>([])
-  const cursor    = useRef({ x: 0, y: 0 })
-  const anchor    = useRef({ x: 0, y: 0 })
-  const raf       = useRef<number>(0)
-  const ready     = useRef(false)
+  const svgRef  = useRef<SVGSVGElement>(null)
+  const pathRef = useRef<SVGPathElement>(null)
+  const clipRef = useRef<HTMLDivElement>(null)
+  const nodes   = useRef<Node[]>([])
+  const cursor  = useRef({ x: 0, y: 0 })
+  const anchor  = useRef({ x: 0, y: 0 })
+  const raf     = useRef<number>(0)
+
+  // A ponta da corda fica no fundo da máquina (82px abaixo do cursor)
+  const CLIP_H = 82
 
   useEffect(() => {
     const W = window.innerWidth
     const H = window.innerHeight
 
-    const ax = W - 36
-    const ay = H - 36
-    anchor.current = { x: ax, y: ay }
+    // Âncora invisível no canto inferior direito (só para física)
+    anchor.current = { x: W - 20, y: H - 20 }
 
-    // Máquina começa no centro da tela
-    cursor.current = { x: W * 0.5, y: H * 0.35 }
-    nodes.current  = makeNodes(ax, ay, cursor.current.x, cursor.current.y)
-    ready.current  = true
+    // Máquina começa no centro/topo da tela
+    cursor.current = { x: W * 0.5, y: H * 0.3 }
 
-    // Posiciona o socket no SVG
-    if (socketRef.current) {
-      socketRef.current.setAttribute("transform", `translate(${ax-18},${ay-18})`)
-    }
+    // Inicializa nós entre âncora e fundo da máquina
+    nodes.current = makeNodes(
+      anchor.current.x, anchor.current.y,
+      cursor.current.x, cursor.current.y + CLIP_H
+    )
 
     // ── Loop de física ─────────────────────────────
     function loop() {
       const { x, y } = cursor.current
-      const { x:ax2, y:ay2 } = anchor.current
-      step(nodes.current, ax2, ay2, x, y)
+      const { x: ax, y: ay } = anchor.current
+
+      // Ponto de ancoragem da corda = fundo da máquina
+      const cordEndX = x
+      const cordEndY = y + CLIP_H
+
+      step(nodes.current, ax, ay, cordEndX, cordEndY)
 
       const d = toPath(nodes.current)
-
-      // Atualiza todas as camadas da corda via DOM direto
       if (pathRef.current) pathRef.current.setAttribute("d", d)
       const main  = svgRef.current?.querySelector("#cord-main")
       const shine = svgRef.current?.querySelector("#cord-shine")
       if (main)  main.setAttribute("d", d)
       if (shine) shine.setAttribute("d", d)
 
-      // Atualiza posição da máquina
+      // Posiciona a máquina com a lâmina no ponto do cursor
       if (clipRef.current)
         clipRef.current.style.transform =
-          `translate(${(x - 26).toFixed(1)}px, ${(y - 4).toFixed(1)}px)`
+          `translate(${(x - 26).toFixed(1)}px, ${y.toFixed(1)}px)`
 
       raf.current = requestAnimationFrame(loop)
     }
@@ -217,87 +219,57 @@ export function CustomCursor() {
       cursor.current = { x: e.clientX, y: e.clientY }
     }
 
-    // ── Touch ──────────────────────────────────────
-    const onTouch = (e: TouchEvent) => {
+    // ── Touch — apenas toque inicial, NÃO segue scroll ──
+    const onTouchStart = (e: TouchEvent) => {
       const t = e.touches[0]
       if (t) cursor.current = { x: t.clientX, y: t.clientY }
     }
 
     // ── Resize ─────────────────────────────────────
     const onResize = () => {
-      anchor.current = { x: window.innerWidth - 36, y: window.innerHeight - 36 }
-      if (socketRef.current) {
-        const { x, y } = anchor.current
-        socketRef.current.setAttribute("transform", `translate(${x-18},${y-18})`)
-      }
+      anchor.current = { x: window.innerWidth - 20, y: window.innerHeight - 20 }
     }
 
-    window.addEventListener("mousemove", onMove)
-    window.addEventListener("touchstart", onTouch, { passive:true })
-    window.addEventListener("touchmove",  onTouch, { passive:true })
-    window.addEventListener("resize", onResize)
+    window.addEventListener("mousemove",  onMove)
+    window.addEventListener("touchstart", onTouchStart, { passive: true })
+    window.addEventListener("resize",     onResize)
 
     return () => {
-      if (raf.current) cancelAnimationFrame(raf.current)
-      window.removeEventListener("mousemove", onMove)
-      window.removeEventListener("touchstart", onTouch)
-      window.removeEventListener("touchmove",  onTouch)
-      window.removeEventListener("resize", onResize)
+      cancelAnimationFrame(raf.current)
+      window.removeEventListener("mousemove",  onMove)
+      window.removeEventListener("touchstart", onTouchStart)
+      window.removeEventListener("resize",     onResize)
     }
   }, [])
 
   return (
     <>
-      {/* SVG overlay — corda + tomada */}
+      {/* SVG overlay — só a corda, sem tomada */}
       <svg
         ref={svgRef}
         className="fixed inset-0 pointer-events-none z-[9997]"
-        style={{ width:"100vw", height:"100vh" }}
+        style={{ width: "100vw", height: "100vh" }}
         aria-hidden="true"
       >
-        <defs>
-          {/* Gradiente de opacidade longo ao longo da corda */}
-          <linearGradient id="cordGrad" gradientUnits="userSpaceOnUse"
-            x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#2a1e0a" stopOpacity="0.9"/>
-            <stop offset="100%" stopColor="#2a1e0a" stopOpacity="0.7"/>
-          </linearGradient>
-        </defs>
-
-        {/* Corda — borda escura (espessura) */}
+        {/* Corda — borda escura (espessura/profundidade) */}
         <path ref={pathRef} d=""
-          stroke="#0a0804"
-          strokeWidth="5"
+          stroke="#050402" strokeWidth="5.5"
           fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-        {/* Corda — camada principal */}
+        {/* Corda — corpo principal (borracha escura) */}
         <path d="" id="cord-main"
-          stroke="#2a1e0a"
-          strokeWidth="3.5"
+          stroke="#1c150a" strokeWidth="3.5"
           fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-        {/* Corda — reflexo (brilho sutil) */}
+        {/* Corda — reflexo dourado sutil */}
         <path d="" id="cord-shine"
-          stroke="oklch(0.78 0.14 82 / 0.18)"
-          strokeWidth="1.5"
+          stroke="oklch(0.78 0.14 82 / 0.15)" strokeWidth="1.5"
           fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-
-        {/* Tomada fixa */}
-        <g ref={socketRef} style={{ pointerEvents:"none" }}>
-          <rect x="0" y="0" width="36" height="28" rx="6"
-            fill="#0d0b05" stroke="oklch(0.78 0.14 82)" strokeWidth="1.4"/>
-          <rect x="8"  y="8" width="5" height="12" rx="2.5"
-            fill="none" stroke="oklch(0.78 0.14 82)" strokeWidth="1.2"/>
-          <rect x="23" y="8" width="5" height="12" rx="2.5"
-            fill="none" stroke="oklch(0.78 0.14 82)" strokeWidth="1.2"/>
-          <circle cx="18" cy="20" r="2"
-            fill="oklch(0.78 0.14 82)" opacity="0.7"/>
-        </g>
       </svg>
 
-      {/* Máquina — posicionada via transform direto */}
+      {/* Máquina — blade no ponto do cursor */}
       <div
         ref={clipRef}
         className="fixed top-0 left-0 z-[9999] pointer-events-none"
-        style={{ willChange:"transform" }}
+        style={{ willChange: "transform" }}
       >
         <Wahl />
       </div>

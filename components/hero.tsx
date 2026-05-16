@@ -109,12 +109,14 @@ export function Hero() {
                 className="absolute -top-6 -right-6 z-20 size-28 md:size-36 float-anim"
                 initial={{ rotate: -12 }}
               >
-                <Image
-                  src="/logo.png"
-                  alt="Logo Barbearia do Alemão"
-                  fill
-                  className="object-contain drop-shadow-[0_8px_24px_rgba(212,175,55,0.4)]"
-                />
+                <div className="relative size-full rounded-2xl bg-black shadow-2xl shadow-black/60 overflow-hidden flex items-center justify-center p-2">
+                  <Image
+                    src="/logo.png"
+                    alt="Logo Barbearia do Alemão"
+                    fill
+                    className="object-contain drop-shadow-[0_4px_12px_rgba(212,175,55,0.4)] p-2"
+                  />
+                </div>
               </motion.div>
 
               {/* Foto principal */}

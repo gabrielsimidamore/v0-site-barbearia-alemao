@@ -65,7 +65,7 @@ const servicos = [
   {
     icon: Baby,
     titulo: "Corte Infantil",
-    preco: "R$ 35",
+    preco: "R$ 40",
     descricao: "Atendimento paciente e ambiente acolhedor para os pequenos. Primeira ida, primeira memória.",
     destaque: false,
   },
@@ -91,6 +91,45 @@ export function Servicos() {
           <p className="mt-4 text-muted-foreground text-pretty">
             Cada serviço é executado com técnica, atenção e o cuidado que o seu visual merece.
           </p>
+        </motion.div>
+
+        {/* Promoção Seg-Qua */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6 }}
+          className="mb-10 relative overflow-hidden rounded-2xl border border-primary/50 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 md:p-8"
+        >
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary mb-3">
+                <span className="size-1.5 rounded-full bg-primary animate-pulse" />
+                Promoção especial
+              </span>
+              <h3 className="font-display text-2xl md:text-3xl tracking-wide text-foreground">
+                Segunda a Quarta
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">Preços especiais nos dias de semana — aproveite!</p>
+            </div>
+            <div className="flex flex-wrap gap-4 shrink-0">
+              {[
+                { label: "Corte", preco: "R$ 35" },
+                { label: "Barba", preco: "R$ 30" },
+                { label: "Corte + Barba", preco: "R$ 60" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="text-center rounded-xl border border-primary/30 bg-background/60 px-5 py-3"
+                >
+                  <div className="font-display text-2xl text-primary">{item.preco}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5 uppercase tracking-wider">{item.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

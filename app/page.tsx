@@ -3,6 +3,7 @@ import { Hero } from "@/components/hero"
 import { Servicos } from "@/components/servicos"
 import { Galeria } from "@/components/galeria"
 import { Workshop } from "@/components/workshop"
+import { Depoimentos } from "@/components/depoimentos"
 import { FAQ } from "@/components/faq"
 import { Contato } from "@/components/contato"
 import { SiteFooter } from "@/components/site-footer"
@@ -18,6 +19,7 @@ export default function Home() {
       <Servicos />
       <Galeria />
       <Workshop />
+      <Depoimentos />
       <FAQ />
       <Contato />
       <SiteFooter />

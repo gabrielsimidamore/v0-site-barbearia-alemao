@@ -4,20 +4,20 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 
 const fotos = [
-  { src: "/cortes/corte-1.png", alt: "Corte fade alto com linha lateral feito na Barbearia do Alemão em Novo Osasco" },
-  { src: "/cortes/corte-11.png", alt: "Corte infantil com risco lateral e degradê em Osasco" },
-  { src: "/cortes/corte-3.png", alt: "Corte degradê com barba completa - Barbearia do Alemão Osasco" },
-  { src: "/cortes/corte-13.png", alt: "Degradê com barba alinhada feita na navalha em Novo Osasco" },
-  { src: "/cortes/corte-12.png", alt: "Corte mullet masculino com fade na Barbearia do Alemão" },
-  { src: "/cortes/corte-2.png", alt: "Tranças masculinas com fade em Osasco" },
-  { src: "/cortes/corte-7.png", alt: "Corte infantil estilo social na Barbearia do Alemão" },
-  { src: "/cortes/corte-14.png", alt: "Mullet cacheado com degradê em Novo Osasco" },
-  { src: "/cortes/corte-9.png", alt: "Buzz cut com fade alto - barbearia em Osasco" },
-  { src: "/cortes/corte-15.png", alt: "Corte mullet com risco lateral na Barbearia do Alemão" },
-  { src: "/cortes/corte-4.png", alt: "Corte masculino com degradê platinado em Osasco" },
-  { src: "/cortes/corte-8.png", alt: "Corte clássico com volume no topo na Barbearia do Alemão" },
-  { src: "/cortes/corte-10.png", alt: "Corte cacheado masculino com fade em Novo Osasco" },
-  { src: "/cortes/corte-6.png", alt: "Corte social com fade lateral feito pelo Alemão em Osasco" },
+  { src: "/cortes/corte-1.png", alt: "Corte fade alto com linha lateral feito na Barbearia do Alemão em Novo Osasco", label: "Fade Alto" },
+  { src: "/cortes/corte-11.png", alt: "Corte infantil com risco lateral e degradê em Osasco", label: "Corte Infantil" },
+  { src: "/cortes/corte-3.png", alt: "Corte degradê com barba completa - Barbearia do Alemão Osasco", label: "Degradê + Barba" },
+  { src: "/cortes/corte-13.png", alt: "Degradê com barba alinhada feita na navalha em Novo Osasco", label: "Barba Navalha" },
+  { src: "/cortes/corte-12.png", alt: "Corte mullet masculino com fade na Barbearia do Alemão", label: "Mullet + Fade" },
+  { src: "/cortes/corte-2.png", alt: "Tranças masculinas com fade em Osasco", label: "Tranças + Fade" },
+  { src: "/cortes/corte-7.png", alt: "Corte infantil estilo social na Barbearia do Alemão", label: "Social Infantil" },
+  { src: "/cortes/corte-14.png", alt: "Mullet cacheado com degradê em Novo Osasco", label: "Mullet Cacheado" },
+  { src: "/cortes/corte-9.png", alt: "Buzz cut com fade alto - barbearia em Osasco", label: "Buzz Cut" },
+  { src: "/cortes/corte-15.png", alt: "Corte mullet com risco lateral na Barbearia do Alemão", label: "Mullet + Risco" },
+  { src: "/cortes/corte-4.png", alt: "Corte masculino com degradê platinado em Osasco", label: "Platinado" },
+  { src: "/cortes/corte-8.png", alt: "Corte clássico com volume no topo na Barbearia do Alemão", label: "Clássico" },
+  { src: "/cortes/corte-10.png", alt: "Corte cacheado masculino com fade em Novo Osasco", label: "Cacheado + Fade" },
+  { src: "/cortes/corte-6.png", alt: "Corte social com fade lateral feito pelo Alemão em Osasco", label: "Social + Fade" },
 ]
 
 // Divide em duas trilhas com sentidos opostos para sensação de fluxo dinâmico
@@ -25,7 +25,7 @@ const metade = Math.ceil(fotos.length / 2)
 const trilha1 = fotos.slice(0, metade)
 const trilha2 = fotos.slice(metade)
 
-type Foto = { src: string; alt: string }
+type Foto = { src: string; alt: string; label: string }
 
 function CarrosselTrilha({
   itens,
@@ -61,17 +61,25 @@ function CarrosselTrilha({
         {loop.map((f, i) => (
           <div
             key={`${f.src}-${i}`}
-            className="relative w-[200px] h-[260px] md:w-[260px] md:h-[340px] flex-shrink-0 overflow-hidden rounded-2xl border border-border shadow-lg shadow-black/40"
+            className="group relative w-[200px] h-[260px] md:w-[260px] md:h-[340px] flex-shrink-0 overflow-hidden rounded-2xl border border-border shadow-lg shadow-black/40 cursor-pointer"
           >
             <Image
               src={f.src || "/placeholder.svg"}
               alt={f.alt}
               fill
               sizes="(max-width: 768px) 200px, 260px"
-              className="object-cover"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
+            {/* Overlay hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {/* Label no hover */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/90 backdrop-blur px-3 py-1.5 text-xs font-medium text-primary-foreground">
+                {f.label}
+              </span>
+            </div>
             {/* Sombra inferior pra dar profundidade */}
-            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/60 to-transparent group-hover:opacity-0 transition-opacity duration-300" />
             {/* Detalhe dourado no canto */}
             <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-primary shadow-[0_0_12px_rgba(212,175,55,0.8)]" />
           </div>

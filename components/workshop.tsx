@@ -102,6 +102,18 @@ export function Workshop() {
               querem evoluir.
             </p>
 
+            {/* Preço em destaque */}
+            <div className="mt-6 inline-flex items-center gap-4 rounded-2xl border border-primary/40 bg-primary/10 px-6 py-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Investimento</div>
+                <div className="font-display text-4xl tracking-wider text-primary gold-shimmer">R$ 497</div>
+              </div>
+              <div className="w-px h-10 bg-primary/20" />
+              <div className="text-sm text-muted-foreground leading-relaxed">
+                Parcelamento<br />disponível no PIX
+              </div>
+            </div>
+
             {/* Card destacando estrutura do curso */}
             <div className="mt-7 grid grid-cols-3 gap-3">
               {detalhes.map((d) => (

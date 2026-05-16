@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
-import { Inter, Bebas_Neue } from "next/font/google"
+import { DM_Sans, Bebas_Neue } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-sans-custom",
   display: "swap",
@@ -115,7 +115,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${bebas.variable} bg-background`}>
+    <html lang="pt-BR" className={`${dmSans.variable} ${bebas.variable} bg-background`}>
       <head>
         <link rel="canonical" href={SITE_URL} />
         <meta name="geo.region" content="BR-SP" />
